@@ -3,22 +3,22 @@ const btn = document.getElementById("btn");
 const listContainer = document.getElementById("listContainer");
 
 const display = async () => {
-  listContainer.innerHTML = ""
+  listContainer.innerHTML = "";
   try {
     const res = await fetch("/tasks");
-    const data = await res.json()
+    if (!res.ok) throw new Error("Failed to fetch tasks");
+    const data = await res.json();
 
     data.forEach(task => {
-      const li = document.createElement('li');
-
-      li.innerHTML = `${task.task}<span><i class='fas fa-close' onclick = "deletetask(${task.id})"></i></span>`;
-
-      listContainer.appendChild(li)
+      const li = document.createElement("li");
+      li.innerHTML = `${task.task} <span><i class='fas fa-close' onclick="deletetask(${task.id})"></i></span>`;
+      listContainer.appendChild(li);
     });
   } catch (err) {
-
+    console.error("Error fetching tasks:", err);
   }
-}
+};
+
 
 display()
 
@@ -43,12 +43,16 @@ const savetask = async () => {
 }
 
 const deletetask = async (id) => {
-  const res = await fetch(`/deletetask/${id}`, { method: "DELETE" })
+  try {
+    const res = await fetch(`/deleteTask/${id}`, { method: "DELETE" });
+    if (!res.ok) throw new Error("Failed to delete task");
+    const data = await res.json();
+    display();
+  } catch (err) {
+    console.error("Error deleting task:", err);
+  }
+};
 
-  const data = await res.json()
-
-  display();
-}
 
 
 
