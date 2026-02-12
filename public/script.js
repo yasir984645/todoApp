@@ -2,32 +2,54 @@ const task = document.getElementById("task");
 const btn = document.getElementById("btn");
 const listContainer = document.getElementById("listContainer");
 
-const loadTask = async () => {
-  const res = await fetch("/displayTask");
-  const data = await res.json();
-
+const display = async () => {
   listContainer.innerHTML = ""
-  data.forEach(task => {
-    const li = document.createElement("li");
-    li.innerHTML =`${task.task}<span></span>`
+  try {
+    const res = await fetch("/tasks");
+    const data = await res.json()
 
-    listContainer.appendChild(li)
-  });
-  
-}
+    data.forEach(task => {
+      const li = document.createElement('li');
 
-loadTask()
+      li.innerHTML = `${task.task}<span><i class='fas fa-close' onclick = "deletetask(${task.id})"></i></span>`;
 
-const saveTask = async () => {
-  const taskValue = task.value;
-  const res = await fetch("/saveTask",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body: JSON.stringify({task:taskValue})
+      listContainer.appendChild(li)
     });
-    
-    res.json(alert(""))
-    loadTask()
+  } catch (err) {
+
+  }
 }
 
-btn.addEventListener("click", saveTask)
+display()
+
+const savetask = async () => {
+  const taskValue = task.value.trim();
+
+  if (!taskValue) return alert("enter task")
+  try {
+    const res = await fetch("/addTask", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ task: taskValue })
+    });
+
+    const data = await res.json()
+    task.value = ""
+    display()
+  } catch (err) {
+    console.error("Error saving task:", err);
+  }
+
+}
+
+const deletetask = async (id) => {
+  const res = await fetch(`/deletetask/${id}`, { method: "DELETE" })
+
+  const data = await res.json()
+
+  display();
+}
+
+
+
+btn.addEventListener("click", savetask)
