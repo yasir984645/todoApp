@@ -9,7 +9,7 @@ const loadTask = async () => {
   listContainer.innerHTML = ""
   data.forEach(task => {
     const li = document.createElement("li");
-    li.textContent = task.task;
+    li.innerHTML =`${task.task}<span></span>`
 
     listContainer.appendChild(li)
   });

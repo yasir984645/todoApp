@@ -62,7 +62,7 @@ h3 {
   border-radius: 5px;
 }
 
-#li{
+li{
   position: relative;
   display: flex;
   align-items: center;
@@ -80,7 +80,7 @@ h3 {
   color: #fff;
 }
 
-#li::before{
+li::before{
   position: absolute;
   content: '';
   right: 0;

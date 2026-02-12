@@ -35,7 +35,19 @@ app.post("/saveTask", (req, res) => {
   );
 });
 
+app.delete("/deleteTask/:id", (req, res)=>{
+  const taskId = +req.params.id;
 
+  db.run('DELETE FROM tasks WHERE id = ?', [taskId], function(err){
+    app.delete("/deleteTask/:id", (req, res)=>{
+  db.run
+})
+app.delete("/deleteTask/:id", (req, res)=>{
+  db.run
+})
+res.json({ message: "Task deleted successfully", id: taskId });
+  })
+})
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT,()=>{
