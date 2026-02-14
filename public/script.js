@@ -1,7 +1,6 @@
 const task = document.getElementById("task");
 const btn = document.getElementById("btn");
 const listContainer = document.getElementById("listContainer");
-
 const BASE_URL = window.location.origin;
 
 const display = async () => {
@@ -21,41 +20,33 @@ const display = async () => {
   }
 };
 
-
-display()
-
 const savetask = async () => {
   const taskValue = task.value.trim();
+  if (!taskValue) return alert("Enter task");
 
-  if (!taskValue) return alert("enter task")
   try {
-    const res = await fetch("/addTask", {
+    const res = await fetch(`${BASE_URL}/addTask`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ task: taskValue })
     });
-
-    const data = await res.json()
-    task.value = ""
-    display()
+    await res.json();
+    task.value = "";
+    display();
   } catch (err) {
     console.error("Error saving task:", err);
   }
-
-}
+};
 
 const deletetask = async (id) => {
   try {
-    const res = await fetch(`/deleteTask/${id}`, { method: "DELETE" });
-    if (!res.ok) throw new Error("Failed to delete task");
-    const data = await res.json();
+    const res = await fetch(`${BASE_URL}/deleteTask/${id}`, { method: "DELETE" });
+    await res.json();
     display();
   } catch (err) {
     console.error("Error deleting task:", err);
   }
 };
 
-
-
-
-btn.addEventListener("click", savetask)
+btn.addEventListener("click", savetask);
+display();

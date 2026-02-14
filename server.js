@@ -1,22 +1,23 @@
-require('dotenv').config(); // load .env first
+require("dotenv").config();
+const express = require("express");
+const cors = require("cors");
+const pool = require("./db");
 
-const express = require('express');
 const app = express();
-const pool = require('./db'); // import pool from db.js
-const cors = require('cors');
 
 // ===== MIDDLEWARE =====
-app.use(cors()); // allow cross-origin requests if you ever connect a frontend
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static('public')); // serve frontend
-
-pool.query('SELECT NOW()', (err, res) => {
-  if (err) console.error('DB connection failed:', err.message);
-  else console.log('DB connected, time:', res.rows[0]);
-});
+app.use(express.static("public"));
 
 // ===== ROUTES =====
+
+// Test DB connection
+pool.query("SELECT NOW()", (err, res) => {
+  if (err) console.error("DB connection failed:", err.message);
+  else console.log("DB connected, time:", res.rows[0]);
+});
 
 // GET ALL TASKS
 app.get("/tasks", async (req, res) => {
@@ -29,7 +30,7 @@ app.get("/tasks", async (req, res) => {
   }
 });
 
-// ADD NEW TASK
+// ADD TASK
 app.post("/addTask", async (req, res) => {
   try {
     const { task } = req.body;
@@ -90,5 +91,5 @@ app.delete("/deleteTask/:id", async (req, res) => {
 // ===== SERVER =====
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
