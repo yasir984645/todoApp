@@ -1,15 +1,12 @@
-// db.js
 const { Pool } = require('pg');
 
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL, // <- use full URL
-  ssl: {
-    rejectUnauthorized: false, // needed for Render
-  },
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false },
 });
 
 pool.connect()
-  .then(() => console.log("Connected to Render PostgreSQL database"))
+  .then(() => console.log("Connected to Supabase PostgreSQL database"))
   .catch(err => console.error("DB connection error:", err));
 
 module.exports = pool;
