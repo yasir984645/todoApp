@@ -11,6 +11,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public')); // serve frontend
 
+pool.query('SELECT NOW()', (err, res) => {
+  if (err) console.error('DB connection failed:', err.message);
+  else console.log('DB connected, time:', res.rows[0]);
+});
+
 // ===== ROUTES =====
 
 // GET ALL TASKS
