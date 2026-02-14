@@ -2,10 +2,12 @@ const task = document.getElementById("task");
 const btn = document.getElementById("btn");
 const listContainer = document.getElementById("listContainer");
 
+const BASE_URL = window.location.origin;
+
 const display = async () => {
   listContainer.innerHTML = "";
   try {
-    const res = await fetch("/tasks");
+    const res = await fetch(`${BASE_URL}/tasks`);
     if (!res.ok) throw new Error("Failed to fetch tasks");
     const data = await res.json();
 
