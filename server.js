@@ -3,11 +3,15 @@ require('dotenv').config(); // load .env first
 const express = require('express');
 const app = express();
 const pool = require('./db'); // import pool from db.js
+const cors = require('cors');
 
-
+// ===== MIDDLEWARE =====
+app.use(cors()); // allow cross-origin requests if you ever connect a frontend
 app.use(express.json());
-app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));
+app.use(express.static('public')); // serve frontend
+
+// ===== ROUTES =====
 
 // GET ALL TASKS
 app.get("/tasks", async (req, res) => {
@@ -15,8 +19,8 @@ app.get("/tasks", async (req, res) => {
     const result = await pool.query("SELECT * FROM task_list ORDER BY id ASC");
     res.json(result.rows);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: err.message });
+    console.error("Error fetching tasks:", err.message);
+    res.status(500).json({ error: "Failed to fetch tasks" });
   }
 });
 
@@ -24,14 +28,16 @@ app.get("/tasks", async (req, res) => {
 app.post("/addTask", async (req, res) => {
   try {
     const { task } = req.body;
+    if (!task) return res.status(400).json({ error: "Task is required" });
+
     const result = await pool.query(
       "INSERT INTO task_list (task) VALUES ($1) RETURNING *",
       [task]
     );
-    res.json(result.rows[0]);
+    res.status(201).json(result.rows[0]);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: err.message });
+    console.error("Error adding task:", err.message);
+    res.status(500).json({ error: "Failed to add task" });
   }
 });
 
@@ -40,14 +46,20 @@ app.put("/updateTask/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const { task } = req.body;
+    if (!task) return res.status(400).json({ error: "Task is required" });
+
     const result = await pool.query(
       "UPDATE task_list SET task = $1 WHERE id = $2 RETURNING *",
       [task, id]
     );
+
+    if (result.rows.length === 0)
+      return res.status(404).json({ error: "Task not found" });
+
     res.json(result.rows[0]);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: err.message });
+    console.error("Error updating task:", err.message);
+    res.status(500).json({ error: "Failed to update task" });
   }
 });
 
@@ -55,15 +67,23 @@ app.put("/updateTask/:id", async (req, res) => {
 app.delete("/deleteTask/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    await pool.query("DELETE FROM task_list WHERE id = $1", [id]);
+    const result = await pool.query(
+      "DELETE FROM task_list WHERE id = $1 RETURNING *",
+      [id]
+    );
+
+    if (result.rows.length === 0)
+      return res.status(404).json({ error: "Task not found" });
+
     res.json({ message: "Task deleted successfully", id });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: err.message });
+    console.error("Error deleting task:", err.message);
+    res.status(500).json({ error: "Failed to delete task" });
   }
 });
 
+// ===== SERVER =====
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
